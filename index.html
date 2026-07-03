@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ultimate Bot Manager Pro v4.0 - Super Features</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #f3f4f6; --sidebar-bg: #ffffff; --card-bg: #ffffff; --text: #1f2937;
+      --text-secondary: #6b7280; --border: #e5e7eb; --primary: #3b82f6;
+      --primary-hover: #2563eb; --danger: #ef4444; --success: #10b981;
+      --warning: #f59e0b; --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+    .dark {
+      --bg: #111827; --sidebar-bg: #1f2937; --card-bg: #1f2937; --text: #f9fafb;
+      --text-secondary: #9ca3af; --border: #374151; --shadow: 0 4px 6px -1px rgba(0,0,0,0.5);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text);
+      display: flex; height: 100vh; transition: background 0.3s, color 0.3s;
+    }
+    .sidebar {
+      width: 300px; background: var(--sidebar-bg); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; z-index: 20; box-shadow: var(--shadow);
+    }
+    .sidebar-header {
+      padding: 24px 16px 12px; border-bottom: 1px solid var(--border);
+    }
+    .sidebar-header h2 {
+      font-size: 1.5rem; display: flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, var(--primary), #8b5cf6);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;
+    }
+    .bot-list { flex: 1; overflow-y: auto; padding: 12px; }
+    .bot-card {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px;
+      padding: 14px; margin-bottom: 10px; cursor: pointer; transition: 0.2s;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .bot-card:hover { border-color: var(--primary); box-shadow: 0 0 15px rgba(59,130,246,0.15); }
+    .bot-card.active { border-color: var(--primary); background: rgba(59,130,246,0.08); }
+    .status-dot {
+      width: 12px; height: 12px; border-radius: 50%; background: #cbd5e1; flex-shrink: 0;
+    }
+    .status-dot.online { background: var(--success); box-shadow: 0 0 12px var(--success); }
+    .add-bot-btn {
+      margin: 0 16px 16px; padding: 12px; border: none;
+      background: linear-gradient(135deg, var(--primary), #6366f1);
+      color: white; border-radius: 12px; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .add-bot-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(59,130,246,0.3); }
+    .content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .top-bar {
+      padding: 16px 32px; background: var(--card-bg); border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
+    }
+    .main-view { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+    .btn {
+      padding: 8px 16px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; font-size: 13px;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .tabs {
+      display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 12px; border-bottom: 2px solid var(--border);
+    }
+    .tab-btn {
+      padding: 8px 18px; border-radius: 20px; border: 1px solid var(--border);
+      background: var(--card-bg); cursor: pointer; font-weight: 500; font-size: 13px;
+    }
+    .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .tab-content { display: none; animation: fade 0.3s; }
+    .tab-content.active { display: block; }
+    @keyframes fade { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+    .glass-card {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px;
+      padding: 24px; box-shadow: var(--shadow);
+    }
+    .grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 20px; }
+    .input-group { margin-bottom: 16px; }
+    label { font-weight: 600; font-size: 13px; color: var(--text-secondary); display: block; margin-bottom: 6px; }
+    input, textarea, select {
+      width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 12px;
+      background: var(--bg); color: var(--text); font-size: 14px;
+    }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); }
+    .item-row {
+      display: flex; gap: 10px; margin-bottom: 10px; align-items: center;
+      background: var(--bg); padding: 10px; border-radius: 12px;
+    }
+    .badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .log-viewer {
+      background: #0f172a; color: #e2e8f0; padding: 16px; border-radius: 16px;
+      height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;
+    }
+    .global-log-viewer { height: 70vh; }
+    .hint { font-size: 11px; color: #888; margin-top: 4px; }
+    .theme-toggle { cursor: pointer; font-size: 1.3rem; }
+  </style>
+</head>
+<body class="light">
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h2><i class="fas fa-robot"></i> BotMan Pro</h2>
+    <span class="theme-toggle" onclick="toggleTheme()"><i id="themeIcon" class="fas fa-moon"></i></span>
+  </div>
+  <div class="bot-list" id="botList"></div>
+  <button class="add-bot-btn" onclick="createNewBot()"><i class="fas fa-plus-circle"></i> Thêm Bot</button>
+</div>
+
+<div class="content">
+  <div id="noSelection" class="no-selection">
+    <i class="fas fa-microchip fa-4x" style="opacity:0.3;"></i>
+    <h2>Chọn Bot để Quản Lý</h2>
+  </div>
+
+  <div id="botWorkspace" style="display:none; flex-direction:column; height:100%;">
+    <div class="top-bar">
+      <h2 id="displayBotName"><span class="status-dot" id="topStatusDot"></span> Tên Bot</h2>
+      <div>
+        <button id="toggleBtn" class="btn btn-success" onclick="toggleBot()"><i class="fas fa-play"></i> Kích hoạt</button>
+        <button class="btn btn-outline" onclick="exportBotConfig()">Xuất</button>
+        <button class="btn btn-outline" onclick="importBotConfig()">Nhập</button>
+        <button class="btn btn-danger" onclick="deleteBot()">Xóa</button>
+      </div>
+    </div>
+    <div class="main-view">
+      <div class="glass-card">
+        <div class="grid-2">
+          <div class="input-group"><label>Tên Bot</label><input id="botName" oninput="updateData()"></div>
+          <div class="input-group"><label>Token</label><input id="botToken" oninput="updateData()" type="password"></div>
+        </div>
+        <div><label>Lệnh Menu</label><input id="botCommands" oninput="updateData()" placeholder="/start, /menu"></div>
+      </div>
+
+      <div class="tabs" id="tabNav">
+        <div class="tab-btn active" data-tab="menu">📋 Menu</div>
+        <div class="tab-btn" data-tab="custom">⚡ Lệnh</div>
+        <div class="tab-btn" data-tab="group">👥 Nhóm</div>
+        <div class="tab-btn" data-tab="autoreply">💬 Auto</div>
+        <div class="tab-btn" data-tab="filter">🛡️ Lọc</div>
+        <div class="tab-btn" data-tab="media">🖼️ Media</div>
+        <div class="tab-btn" data-tab="antispam">⏱️ Spam</div>
+        <div class="tab-btn" data-tab="game">🎮 Game</div>
+        <div class="tab-btn" data-tab="api">🌐 API</div>
+        <div class="tab-btn" data-tab="reminder">⏰ Nhắc</div>
+        <div class="tab-btn" data-tab="language">🌍 Ngôn ngữ</div>
+        <div class="tab-btn" data-tab="warn">⚠️ Warn</div>
+        <div class="tab-btn" data-tab="schedule">📅 Lịch</div>
+        <div class="tab-btn" data-tab="admin">👑 Admin</div>
+        <div class="tab-btn" data-tab="broadcast">📢 Broadcast</div>
+        <div class="tab-btn" data-tab="dashboard">📈 Stats</div>
+        <div class="tab-btn" data-tab="logs">📜 System Logs</div>
+      </div>
+
+      <!-- Các tab nội dung (giữ lại những cái cũ và thêm mới) -->
+      <div id="tab-menu" class="tab-content active">
+        <div class="glass-card">
+          <label>Menu Text</label><textarea id="menuText" rows="2" oninput="updateData()"></textarea>
+          <label>Buttons</label><div id="menuBuilder"></div>
+          <button class="btn btn-outline" onclick="addMenuRow()">+ Thêm nút</button>
+        </div>
+      </div>
+      <div id="tab-custom" class="tab-content">
+        <div class="glass-card">
+          <div id="customCmdBuilder"></div>
+          <button class="btn btn-outline" onclick="addCustomCmdRow()">+ Thêm lệnh</button>
+        </div>
+      </div>
+      <div id="tab-group" class="tab-content">
+        <div class="glass-card">
+          <div class="input-group"><label>Chào mừng</label><textarea id="joinMsg" oninput="updateData()"></textarea></div>
+          <div class="input-group"><label>Tạm biệt</label><textarea id="leaveMsg" oninput="updateData()"></textarea></div>
+          <div class="input-group"><label>Silent Mode</label><select id="silentMode" onchange="updateData()"><option value="off">Tắt</option><option value="on">Bật</option></select></div>
+        </div>
+      </div>
+      <div id="tab-autoreply" class="tab-content">
+        <div class="glass-card">
+          <div id="replyBuilder"></div>
+          <button class="btn btn-outline" onclick="addReplyRow()">+ Thêm phản hồi</button>
+        </div>
+      </div>
+      <div id="tab-filter" class="tab-content">
+        <div class="glass-card">
+          <div class="input-group"><label>Từ cấm</label><textarea id="badWords" oninput="updateData()"></textarea></div>
+          <div class="input-group"><label>Hành động</label><select id="filterAction" onchange="updateData()"><option value="delete">Xóa</option><option value="warn">Cảnh cáo</option><option value="mute">Mute 5p</option><option value="ban">Ban</option></select></div>
+          <div class="input-group"><label>Cảnh cáo mẫu</label><input id="warnMsg" oninput="updateData()" value="Cảnh cáo {name}!"></div>
+        </div>
+      </div>
+      <div id="tab-media" class="tab-content">
+        <div class="glass-card">
+          <div id="mediaBuilder"></div>
+          <button class="btn btn-outline" onclick="addMediaRow()">+ Thêm media</button>
+        </div>
+      </div>
+      <div id="tab-antispam" class="tab-content">
+        <div class="glass-card">
+          <div class="input-group"><label>Khoảng spam (giây)</label><input type="number" id="spamInterval" oninput="updateData()"></div>
+          <div class="input-group"><label>Hành động</label><select id="spamAction" onchange="updateData()"><option value="delete">Xóa</option><option value="mute">Mute 10p</option></select></div>
+        </div>
+      </div>
+
+      <!-- Tab Game mới -->
+      <div id="tab-game" class="tab-content">
+        <div class="glass-card">
+          <label>🎲 Game Đoán Số</label>
+          <div class="input-group"><input id="guessMin" placeholder="Min (mặc định 1)" type="number" oninput="updateData()"></div>
+          <div class="input-group"><input id="guessMax" placeholder="Max (mặc định 100)" type="number" oninput="updateData()"></div>
+          <div class="input-group"><label>Câu chúc mừng</label><input id="guessWinMsg" oninput="updateData()" value="Chúc mừng {name}, bạn đã đoán đúng!"></div>
+          <label>🎰 Lật đồng xu / Xúc xắc</label>
+          <div class="flex-row">
+            <button class="btn btn-primary" onclick="sendDice()">Gửi xúc xắc</button>
+            <button class="btn btn-outline" onclick="sendCoin()">Gửi đồng xu</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab API mới -->
+      <div id="tab-api" class="tab-content">
+        <div class="glass-card">
+          <label>🌤️ Thời tiết (OpenWeatherMap)</label>
+          <div class="input-group"><input id="weatherApiKey" placeholder="API Key" oninput="updateData()"></div>
+          <div class="input-group"><input id="weatherCity" placeholder="Thành phố mặc định" oninput="updateData()"></div>
+          <div class="hint">Lệnh /weather để xem thời tiết</div>
+          <label>😂 Joke (JokeAPI)</label>
+          <div class="hint">Lệnh /joke để nghe joke</div>
+          <label>💱 Crypto (CoinGecko)</label>
+          <div class="hint">Lệnh /crypto [coin_id]</div>
+        </div>
+      </div>
+
+      <!-- Tab Reminder -->
+      <div id="tab-reminder" class="tab-content">
+        <div class="glass-card">
+          <div id="reminderBuilder"></div>
+          <button class="btn btn-outline" onclick="addReminderRow()">+ Thêm lịch nhắc</button>
+          <div class="hint">/remind [phút] [nội dung]</div>
+        </div>
+      </div>
+
+      <!-- Tab Ngôn ngữ -->
+      <div id="tab-language" class="tab-content">
+        <div class="glass-card">
+          <label>Chọn ngôn ngữ phản hồi</label>
+          <select id="botLanguage" onchange="updateData()">
+            <option value="vi">Tiếng Việt</option>
+            <option value="en">English</option>
+            <option value="ja">日本語</option>
+          </select>
+          <div class="hint">Một số câu trả lời sẽ được dịch tự động</div>
+        </div>
+      </div>
+
+      <!-- Tab Warn System -->
+      <div id="tab-warn" class="tab-content">
+        <div class="glass-card">
+          <div class="input-group"><label>Số lần warn tối đa trước ban</label><input type="number" id="maxWarns" value="3" oninput="updateData()"></div>
+          <div class="input-group"><label>Thời gian mute sau warn (phút)</label><input type="number" id="warnMuteDuration" value="5" oninput="updateData()"></div>
+          <div class="hint">Bot sẽ tự động ban khi đạt số lần warn</div>
+        </div>
+      </div>
+
+      <div id="tab-schedule" class="tab-content">
+        <div class="glass-card">
+          <div id="scheduleBuilder"></div>
+          <button class="btn btn-outline" onclick="addScheduleRow()">+ Thêm lịch</button>
+        </div>
+      </div>
+      <div id="tab-admin" class="tab-content">
+        <div class="glass-card">
+          <div class="flex-row">
+            <input placeholder="Chat ID" id="adminChatId">
+            <input placeholder="User ID" id="adminUserId">
+          </div>
+          <div class="flex-row" style="margin-top:10px;">
+            <button class="btn btn-primary" onclick="adminAction('ban')">Ban</button>
+            <button class="btn btn-warning" onclick="adminAction('mute')">Mute</button>
+            <button class="btn btn-success" onclick="adminAction('unmute')">Unmute</button>
+            <button class="btn btn-outline" onclick="adminAction('unban')">Unban</button>
+          </div>
+        </div>
+      </div>
+      <div id="tab-broadcast" class="tab-content">
+        <div class="glass-card">
+          <textarea id="broadcastMsg" placeholder="Nội dung..."></textarea>
+          <button class="btn btn-primary" onclick="sendBroadcast()">Gửi Broadcast</button>
+          <span id="broadcastStatus"></span>
+        </div>
+      </div>
+      <div id="tab-dashboard" class="tab-content">
+        <div class="glass-card"><div id="dashboardStats">Đang tải...</div></div>
+      </div>
+      <div id="tab-logs" class="tab-content">
+        <div class="glass-card" style="padding:12px;">
+          <div id="globalLogViewer" class="log-viewer global-log-viewer">Chưa có log</div>
+        </div>
+      </div>
+
+      <div class="log-viewer" id="logConsole"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (() => {
+    let bots = JSON.parse(localStorage.getItem('tg_v4_super')) || [];
+    let curId = null;
+    let controllers = {};
+    let globalLogs = [];
+
+    function save() { localStorage.setItem('tg_v4_super', JSON.stringify(bots)); }
+    function currentBot() { return bots.find(b => b.id === curId); }
+
+    function pushGlobalLog(botId, botName, msg, type='info') {
+      globalLogs.push({ time: new Date().toLocaleTimeString(), botId, botName, message: msg, type });
+      updateGlobalLogViewer();
+      if (botId === curId) addLocalLog(msg, type);
+    }
+    function addLocalLog(msg, type) {
+      const el = document.getElementById('logConsole');
+      if (!el) return;
+      el.innerHTML += `<div style="color:${type==='error'?'#f87171':type==='success'?'#34d399':'#cbd5e1'}">[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+      el.scrollTop = el.scrollHeight;
+    }
+    function updateGlobalLogViewer() {
+      const viewer = document.getElementById('globalLogViewer');
+      if (!viewer) return;
+      viewer.innerHTML = globalLogs.slice(-100).map(e => 
+        `<div><span style="color:#94a3b8;">${e.time}</span> <b>[${e.botName}]</b> <span class="${e.type}">${e.message}</span></div>`
+      ).join('');
+      viewer.scrollTop = viewer.scrollHeight;
+    }
+
+    window.toggleTheme = () => {
+      document.body.classList.toggle('dark');
+      document.getElementById('themeIcon').className = document.body.classList.contains('dark') ? 'fas fa-sun' : 'fas fa-moon';
+    };
+
+    document.getElementById('tabNav').addEventListener('click', e => {
+      if (e.target.classList.contains('tab-btn')) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById('tab-' + e.target.dataset.tab)?.classList.add('active');
+      }
+    });
+
+    window.createNewBot = () => {
+      const id = 'bot_' + Date.now();
+      bots.push({
+        id, name: 'Bot mới', token: '', commands: '/start', menuText: 'Xin chào!',
+        joinMsg: '', leaveMsg: '', buttons: [], autoreplies: [], customCommands: [],
+        badWords: '', filterAction: 'delete', warnMsg: 'Cảnh cáo {name}!',
+        mediaCommands: [], spamInterval: 3, spamAction: 'delete', silentMode: 'off',
+        schedules: [], isRunning: false, lastId: 0, knownChats: [],
+        gameGuessMin: 1, gameGuessMax: 100, gameGuessWinMsg: 'Chúc mừng {name}, bạn đoán đúng!',
+        weatherApiKey: '', weatherCity: 'Hanoi',
+        language: 'vi', maxWarns: 3, warnMuteDuration: 5,
+        reminders: []
+      });
+      save(); renderList(); selectBot(id);
+    };
+
+    window.updateData = () => {
+      const b = currentBot(); if (!b) return;
+      b.name = $('botName').value; b.token = $('botToken').value.trim();
+      b.commands = $('botCommands').value; b.menuText = $('menuText').value;
+      b.joinMsg = $('joinMsg').value; b.leaveMsg = $('leaveMsg').value;
+      b.badWords = $('badWords')?.value || '';
+      b.filterAction = $('filterAction')?.value;
+      b.warnMsg = $('warnMsg')?.value;
+      b.spamInterval = parseInt($('spamInterval')?.value) || 3;
+      b.spamAction = $('spamAction')?.value;
+      b.silentMode = $('silentMode')?.value || 'off';
+      b.gameGuessMin = parseInt($('guessMin')?.value) || 1;
+      b.gameGuessMax = parseInt($('guessMax')?.value) || 100;
+      b.gameGuessWinMsg = $('guessWinMsg')?.value;
+      b.weatherApiKey = $('weatherApiKey')?.value;
+      b.weatherCity = $('weatherCity')?.value;
+      b.language = $('botLanguage')?.value || 'vi';
+      b.maxWarns = parseInt($('maxWarns')?.value) || 3;
+      b.warnMuteDuration = parseInt($('warnMuteDuration')?.value) || 5;
+      b.buttons = collectMenuRows(); b.autoreplies = collectReplyRows();
+      b.customCommands = collectCustomCmdRows(); b.mediaCommands = collectMediaRows();
+      b.schedules = collectScheduleRows(); b.reminders = collectReminderRows();
+      save(); renderList();
+    };
+
+    function $(id) { return document.getElementById(id); }
+    function collectMenuRows() { return Array.from(document.querySelectorAll('#menuBuilder .item-row')).map(r => ({ text: r.querySelector('.in-text').value, type: r.querySelector('.in-type').value, val: r.querySelector('.in-val').value })); }
+    function collectReplyRows() { return Array.from(document.querySelectorAll('#replyBuilder .item-row')).map(r => ({ key: r.querySelector('.in-key').value, ans: r.querySelector('.in-ans').value })); }
+    function collectCustomCmdRows() { return Array.from(document.querySelectorAll('#customCmdBuilder .item-row')).map(r => ({ cmd: r.querySelector('.in-cmd').value, reply: r.querySelector('.in-reply').value })); }
+    function collectMediaRows() { return Array.from(document.querySelectorAll('#mediaBuilder .item-row')).map(r => ({ command: r.querySelector('.in-mcmd').value, type: r.querySelector('.in-mtype').value, url: r.querySelector('.in-murl').value, caption: r.querySelector('.in-mcap').value })); }
+    function collectScheduleRows() { return Array.from(document.querySelectorAll('#scheduleBuilder .item-row')).map(r => ({ cron: r.querySelector('.in-cron').value, message: r.querySelector('.in-msg').value, chatId: r.querySelector('.in-chatid').value })); }
+    function collectReminderRows() { return Array.from(document.querySelectorAll('#reminderBuilder .item-row')).map(r => ({ time: r.querySelector('.in-rem-time').value, content: r.querySelector('.in-rem-content').value, chatId: r.querySelector('.in-rem-chatid').value })); }
+
+    function renderList() {
+      $('botList').innerHTML = bots.map(b => `
+        <div class="bot-card ${b.id===curId?'active':''}" onclick="selectBot('${b.id}')">
+          <span class="status-dot ${b.isRunning?'online':''}"></span>
+          <span style="flex:1;">${b.name}</span>
+          <span class="badge">${b.isRunning?'ON':'OFF'}</span>
+        </div>`).join('');
+    }
+
+    window.selectBot = (id) => {
+      curId = id; const b = currentBot(); if (!b) return;
+      $('noSelection').style.display = 'none'; $('botWorkspace').style.display = 'flex';
+      $('displayBotName').innerHTML = `<span class="status-dot ${b.isRunning?'online':''}"></span> ${b.name}`;
+      $('botName').value = b.name; $('botToken').value = b.token; $('botCommands').value = b.commands;
+      $('menuText').value = b.menuText; $('joinMsg').value = b.joinMsg||''; $('leaveMsg').value = b.leaveMsg||'';
+      $('badWords').value = b.badWords||''; $('filterAction').value = b.filterAction;
+      $('warnMsg').value = b.warnMsg||''; $('spamInterval').value = b.spamInterval;
+      $('spamAction').value = b.spamAction; $('silentMode').value = b.silentMode||'off';
+      $('guessMin').value = b.gameGuessMin; $('guessMax').value = b.gameGuessMax;
+      $('guessWinMsg').value = b.gameGuessWinMsg; $('weatherApiKey').value = b.weatherApiKey||'';
+      $('weatherCity').value = b.weatherCity||''; $('botLanguage').value = b.language||'vi';
+      $('maxWarns').value = b.maxWarns; $('warnMuteDuration').value = b.warnMuteDuration;
+      buildMenuRows(b.buttons); buildReplyRows(b.autoreplies);
+      buildCustomCmdRows(b.customCommands); buildMediaRows(b.mediaCommands);
+      buildScheduleRows(b.schedules); buildReminderRows(b.reminders);
+      refreshToggleBtn(b);
+      $('logConsole').innerHTML = '';
+      renderList(); updateDashboardStats();
+    };
+
+    function buildMenuRows(arr) { const c = $('menuBuilder'); c.innerHTML = ''; (arr||[]).forEach(b => addMenuRow(b.text, b.type, b.val)); }
+    function buildReplyRows(arr) { const c = $('replyBuilder'); c.innerHTML = ''; (arr||[]).forEach(r => addReplyRow(r.key, r.ans)); }
+    function buildCustomCmdRows(arr) { const c = $('customCmdBuilder'); c.innerHTML = ''; (arr||[]).forEach(cmd => addCustomCmdRow(cmd.cmd, cmd.reply)); }
+    function buildMediaRows(arr) { const c = $('mediaBuilder'); c.innerHTML = ''; (arr||[]).forEach(m => addMediaRow(m.command, m.type, m.url, m.caption)); }
+    function buildScheduleRows(arr) { const c = $('scheduleBuilder'); c.innerHTML = ''; (arr||[]).forEach(s => addScheduleRow(s.cron, s.message, s.chatId)); }
+    function buildReminderRows(arr) { const c = $('reminderBuilder'); c.innerHTML = ''; (arr||[]).forEach(r => addReminderRow(r.time, r.content, r.chatId)); }
+
+    window.addMenuRow = (text="", type="callback", val="") => {
+      const d = document.createElement('div'); d.className='item-row';
+      d.innerHTML = `<input class="in-text" value="${text}" placeholder="Nút" oninput="updateData()"><select class="in-type" onchange="updateData()"><option value="callback" ${type==='callback'?'selected':''}>Callback</option><option value="url" ${type==='url'?'selected':''}>URL</option></select><input class="in-val" value="${val}" placeholder="Giá trị" oninput="updateData()"><button class="btn-danger" onclick="this.parentElement.remove();updateData()">✕</button>`;
+      $('menuBuilder').appendChild(d);
+    };
+    window.addReplyRow = (key="", ans="") => {
+      const d = document.createElement('div'); d.className='item-row';
+      d.innerHTML = `<input class="in-key" value="${key}" placeholder="Từ khóa" oninput="updateData()"><input class="in-ans" value="${ans}" placeholder="Trả lời" oninput="updateData()"><button class="btn-danger" onclick="this.parentElement.remove();updateData()">✕</button>`;
+      $('replyBuilder').appendChild(d);
+    };
+    window.addCustomCmdRow = (cmd="", reply="") => {
+      const d = document.createElement('div'); d.className='item-row';
+      d.innerHTML = `<input class="in-cmd" value="${cmd}" placeholder="/lenh" oninput="updateData()"><input class="in-reply" value="${reply}" placeholder="Phản hồi" oninput="updateData()"><button class="btn-danger" onclick="this.parentElement.remove();updateData()">✕</button>`;
+      $('customCmdBuilder').appendChild(d);
+    };
+    window.addMediaRow = (cmd="", type="photo", url="", cap="") => {
+      const d = document.createElement('div'); d.className='item-row';
+      d.innerHTML = `<input class="in-mcmd" value="${cmd}" placeholder="/lenh" oninput="updateData()"><select class="in-mtype" onchange="updateData()"><option value="photo" ${type==='photo'?'selected':''}>Ảnh</option><option value="video" ${type==='video'?'selected':''}>Video</option></select><input class="in-murl" value="${url}" placeholder="URL" oninput="updateData()"><input class="in-mcap" value="${cap}" placeholder="Caption" oninput="updateData()"><button class="btn-danger" onclick="this.parentElement.remove();updateData()">✕</button>`;
+      $('mediaBuilder').appendChild(d);
+    };
+    window.addScheduleRow = (cron="0 9 * * *", msg="", chatId="") => {
+      const d = document.createElement('div'); d.className='item-row';
+      d.innerHTML = `<input class="in-cron" value="${cron}" placeholder="Cron" oninput="updateData()"><input class="in-msg" value="${msg}" placeholder="Message" oninput="updateData()"><input class="in-chatid" value="${chatId}" placeholder="Chat ID (trống=all)" oninput="updateData()"><button class="btn-danger" onclick="this.parentElement.remove();updateData()">✕</button>`;
+      $('scheduleBuilder').appendChild(d);
+    };
+    window.addReminderRow = (time="", content="", chatId="") => {
+      const d = document.createElement('div'); d.className='item-row';
+      d.innerHTML = `<input class="in-rem-time" value="${time}" placeholder="Phút (số)" oninput="updateData()"><input class="in-rem-content" value="${content}" placeholder="Nội dung" oninput="updateData()"><input class="in-rem-chatid" value="${chatId}" placeholder="Chat ID" oninput="updateData()"><button class="btn-danger" onclick="this.parentElement.remove();updateData()">✕</button>`;
+      $('reminderBuilder').appendChild(d);
+    };
+
+    function refreshToggleBtn(b) {
+      const btn = $('toggleBtn');
+      btn.innerHTML = b.isRunning ? '<i class="fas fa-stop"></i> Dừng' : '<i class="fas fa-play"></i> Kích hoạt';
+      btn.className = b.isRunning ? 'btn btn-danger' : 'btn btn-success';
+    }
+
+    async function polling(b, signal) {
+      while (b.isRunning) {
+        try {
+          const res = await fetch(`https://api.telegram.org/bot${b.token}/getUpdates?offset=${b.lastId+1}&timeout=25`, { signal });
+          const d = await res.json();
+          if (d.ok && d.result.length) {
+            for (const u of d.result) { b.lastId = u.update_id; handleUpdate(b, u); }
+            save();
+          } else if (!d.ok && d.error_code === 409) {
+            pushGlobalLog(b.id, b.name, "Token conflict", "error");
+            b.isRunning = false; refreshToggleBtn(b); renderList(); break;
+          }
+        } catch (e) { if (e.name === 'AbortError') break; await new Promise(r => setTimeout(r, 5000)); }
+      }
+    }
+
+    async function handleUpdate(b, u) {
+      const msg = u.message; if (!msg) return;
+      const cid = msg.chat.id; const uid = msg.from?.id; const uname = msg.from?.first_name || 'User';
+      if (!b.knownChats.includes(cid)) { b.knownChats.push(cid); save(); }
+
+      // Silent mode
+      if (b.silentMode === 'on' && msg.text && !msg.text.startsWith('/')) {
+        sendApi(b.token, 'deleteMessage', { chat_id: cid, message_id: msg.message_id });
+        return;
+      }
+      // Spam
+      if (msg.text && b.spamInterval) {
+        const now = Date.now(); const key = `${cid}_${uid}`;
+        if (!b._spam) b._spam = {};
+        if (now - (b._spam[key] || 0) < b.spamInterval * 1000) {
+          if (b.spamAction === 'delete') sendApi(b.token, 'deleteMessage', { chat_id: cid, message_id: msg.message_id });
+          else sendApi(b.token, 'restrictChatMember', { chat_id: cid, user_id: uid, until_date: Math.floor(now/1000)+600, can_send_messages: false });
+          return;
+        }
+        b._spam[key] = now;
+      }
+      // Bad words
+      if (msg.text && b.badWords) {
+        const words = b.badWords.split(',').map(w => w.trim().toLowerCase()).filter(w => w);
+        if (words.some(w => msg.text.toLowerCase().includes(w))) {
+          sendApi(b.token, 'deleteMessage', { chat_id: cid, message_id: msg.message_id });
+          if (b.filterAction === 'warn') {
+            sendApi(b.token, 'sendMessage', { chat_id: cid, text: b.warnMsg.replace('{name}', uname) });
+            await handleWarn(b, cid, uid, uname);
+          } else if (b.filterAction === 'mute') {
+            sendApi(b.token, 'restrictChatMember', { chat_id: cid, user_id: uid, until_date: Math.floor(Date.now()/1000)+300, can_send_messages: false });
+          } else if (b.filterAction === 'ban') {
+            sendApi(b.token, 'banChatMember', { chat_id: cid, user_id: uid });
+          }
+          return;
+        }
+      }
+      // New members
+      if (msg.new_chat_members && b.joinMsg) {
+        for (const m of msg.new_chat_members) {
+          const name = m.first_name + (m.last_name?' '+m.last_name:'');
+          sendApi(b.token, 'sendMessage', { chat_id: cid, text: b.joinMsg.replace('{name}', name).replace('{id}', m.id) });
+        }
+      }
+      if (msg.left_chat_member && b.leaveMsg) {
+        const m = msg.left_chat_member;
+        const name = m.first_name + (m.last_name?' '+m.last_name:'');
+        sendApi(b.token, 'sendMessage', { chat_id: cid, text: b.leaveMsg.replace('{name}', name) });
+      }
+
+      if (msg.text) {
+        const txt = msg.text.trim(); const lower = txt.toLowerCase();
+
+        // Game đoán số
+        if (b._gameActive && b._gameChat === cid) {
+          const guess = parseInt(txt);
+          if (!isNaN(guess)) {
+            if (guess === b._gameNumber) {
+              sendApi(b.token, 'sendMessage', { chat_id: cid, text: b.gameGuessWinMsg.replace('{name}', uname) });
+              delete b._gameActive; delete b._gameNumber; delete b._gameChat;
+            } else {
+              sendApi(b.token, 'sendMessage', { chat_id: cid, text: guess < b._gameNumber ? 'Lớn hơn' : 'Nhỏ hơn' });
+            }
+            return;
+          }
+        }
+
+        // Lệnh game
+        if (lower === '/guess') {
+          b._gameNumber = Math.floor(Math.random() * (b.gameGuessMax - b.gameGuessMin + 1)) + b.gameGuessMin;
+          b._gameActive = true; b._gameChat = cid;
+          sendApi(b.token, 'sendMessage', { chat_id: cid, text: `Đoán số từ ${b.gameGuessMin} đến ${b.gameGuessMax}` });
+          return;
+        }
+        if (lower === '/dice') { sendApi(b.token, 'sendDice', { chat_id: cid }); return; }
+        if (lower === '/coin') { sendApi(b.token, 'sendDice', { chat_id: cid, emoji: '🎰' }); return; }
+
+        // API commands
+        if (lower === '/weather') {
+          if (!b.weatherApiKey) { sendApi(b.token, 'sendMessage', { chat_id: cid, text: 'Chưa có API key thời tiết' }); return; }
+          try {
+            const wRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${b.weatherCity}&appid=${b.weatherApiKey}&units=metric&lang=${b.language}`);
+            const wData = await wRes.json();
+            sendApi(b.token, 'sendMessage', { chat_id: cid, text: `Thời tiết ${wData.name}: ${wData.weather[0].description}, ${wData.main.temp}°C` });
+          } catch (e) { sendApi(b.token, 'sendMessage', { chat_id: cid, text: 'Lỗi lấy thời tiết' }); }
+          return;
+        }
+        if (lower === '/joke') {
+          try {
+            const jRes = await fetch('https://v2.jokeapi.dev/joke/Any?safe-mode');
+            const jData = await jRes.json();
+            const joke = jData.joke || `${jData.setup} - ${jData.delivery}`;
+            sendApi(b.token, 'sendMessage', { chat_id: cid, text: joke });
+          } catch (e) { sendApi(b.token, 'sendMessage', { chat_id: cid, text: 'Không lấy được joke' }); }
+          return;
+        }
+        if (lower.startsWith('/crypto')) {
+          const coin = txt.split(' ')[1] || 'bitcoin';
+          try {
+            const cRes = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coin}&vs_currencies=usd`);
+            const cData = await cRes.json();
+            if (cData[coin]) sendApi(b.token, 'sendMessage', { chat_id: cid, text: `${coin}: $${cData[coin].usd}` });
+            else sendApi(b.token, 'sendMessage', { chat_id: cid, text: 'Không tìm thấy coin' });
+          } catch (e) { sendApi(b.token, 'sendMessage', { chat_id: cid, text: 'Lỗi crypto' }); }
+          return;
+        }
+
+        // Reminder: /remind 10 Nhắn đi họp
+        if (lower.startsWith('/remind')) {
+          const parts = txt.split(' ').slice(1);
+          const minutes = parseInt(parts[0]);
+          const content = parts.slice(1).join(' ');
+          if (!isNaN(minutes) && content) {
+            setTimeout(() => {
+              sendApi(b.token, 'sendMessage', { chat_id: cid, text: `⏰ ${content}` });
+            }, minutes * 60000);
+            sendApi(b.token, 'sendMessage', { chat_id: cid, text: `Đã đặt nhắc sau ${minutes} phút.` });
+          } else sendApi(b.token, 'sendMessage', { chat_id: cid, text: 'Cú pháp: /remind [phút] [nội dung]' });
+          return;
+        }
+
+        // Custom commands
+        const cmdMatch = (b.customCommands||[]).find(c => c.cmd.toLowerCase() === lower);
+        if (cmdMatch) { sendApi(b.token, 'sendMessage', { chat_id: cid, text: cmdMatch.reply.replace('{name}', uname) }); return; }
+        // Media commands
+        const mediaMatch = (b.mediaCommands||[]).find(m => m.command.toLowerCase() === lower);
+        if (mediaMatch) {
+          sendApi(b.token, 'send' + mediaMatch.type.charAt(0).toUpperCase() + mediaMatch.type.slice(1), {
+            chat_id: cid, [mediaMatch.type]: mediaMatch.url, caption: mediaMatch.caption || ''
+          }); return;
+        }
+        // Menu command
+        if (b.commands.split(',').map(c => c.trim().toLowerCase()).includes(lower)) {
+          const kb = { inline_keyboard: b.buttons.map(btn => [{ text: btn.text, [btn.type==='url'?'url':'callback_data']: btn.val }]) };
+          sendApi(b.token, 'sendMessage', { chat_id: cid, text: b.menuText, reply_markup: kb }); return;
+        }
+        // Autoreply
+        (b.autoreplies||[]).forEach(ar => { if (ar.key && lower.includes(ar.key.toLowerCase())) sendApi(b.token, 'sendMessage', { chat_id: cid, text: ar.ans }); });
+      }
+    }
+
+    async function handleWarn(b, cid, uid, uname) {
+      if (!b._warns) b._warns = {};
+      const key = `${cid}_${uid}`;
+      b._warns[key] = (b._warns[key] || 0) + 1;
+      save();
+      if (b._warns[key] >= b.maxWarns) {
+        sendApi(b.token, 'banChatMember', { chat_id: cid, user_id: uid });
+        sendApi(b.token, 'sendMessage', { chat_id: cid, text: `${uname} bị ban vì đạt ${b.maxWarns} lần cảnh cáo.` });
+        delete b._warns[key];
+      } else {
+        sendApi(b.token, 'restrictChatMember', { chat_id: cid, user_id: uid, until_date: Math.floor(Date.now()/1000) + b.warnMuteDuration*60, can_send_messages: false });
+      }
+    }
+
+    async function sendApi(token, method, body) {
+      try {
+        const res = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+        });
+        const d = await res.json();
+        if (!d.ok) pushGlobalLog(curId, currentBot()?.name, `API error: ${d.description}`, 'error');
+      } catch (e) { pushGlobalLog(curId, currentBot()?.name, `Network: ${e.message}`, 'error'); }
+    }
+
+    window.toggleBot = async () => {
+      const b = currentBot(); if (!b || !b.token) return alert('Nhập token');
+      if (b.isRunning) {
+        b.isRunning = false;
+        if (controllers[b.id]) { controllers[b.id].abort(); delete controllers[b.id]; }
+        pushGlobalLog(b.id, b.name, 'Đã dừng', 'info');
+      } else {
+        b.isRunning = true;
+        controllers[b.id] = new AbortController();
+        polling(b, controllers[b.id].signal);
+        pushGlobalLog(b.id, b.name, 'Đã khởi động', 'success');
+      }
+      save(); refreshToggleBtn(b); renderList();
+    };
+
+    window.deleteBot = () => {
+      if (!confirm('Xóa?')) return;
+      const b = currentBot();
+      if (b && controllers[b.id]) controllers[b.id].abort();
+      bots = bots.filter(b => b.id !== curId);
+      pushGlobalLog(curId, b?.name, 'Đã xóa', 'warning');
+      curId = null; save(); renderList();
+      $('botWorkspace').style.display = 'none'; $('noSelection').style.display = 'flex';
+    };
+
+    window.sendBroadcast = async () => {
+      const b = currentBot(); if (!b) return;
+      const msg = $('broadcastMsg').value.trim(); if (!msg) return;
+      const chats = b.knownChats; if (!chats.length) { $('broadcastStatus').innerText = 'Chưa có chat'; return; }
+      $('broadcastStatus').innerText = 'Đang gửi...';
+      for (const cid of chats) { await sendApi(b.token, 'sendMessage', { chat_id: cid, text: msg }); await new Promise(r => setTimeout(r, 200)); }
+      $('broadcastStatus').innerText = 'Hoàn tất';
+    };
+
+    window.adminAction = async (action) => {
+      const b = currentBot(); if (!b || !b.token) return;
+      const chatId = $('adminChatId').value, userId = $('adminUserId').value;
+      if (!chatId || !userId) return alert('Nhập Chat ID và User ID');
+      if (action === 'ban') sendApi(b.token, 'banChatMember', { chat_id: chatId, user_id: userId });
+      else if (action === 'unban') sendApi(b.token, 'unbanChatMember', { chat_id: chatId, user_id: userId });
+      else if (action === 'mute') sendApi(b.token, 'restrictChatMember', { chat_id: chatId, user_id: userId, until_date: Math.floor(Date.now()/1000)+600, can_send_messages: false });
+      else if (action === 'unmute') sendApi(b.token, 'restrictChatMember', { chat_id: chatId, user_id: userId, can_send_messages: true });
+    };
+
+    window.sendDice = () => { const b = currentBot(); if (b) sendApi(b.token, 'sendDice', { chat_id: prompt('Chat ID:') }); };
+    window.sendCoin = () => { const b = currentBot(); if (b) sendApi(b.token, 'sendDice', { chat_id: prompt('Chat ID:'), emoji: '🎰' }); };
+
+    function updateDashboardStats() {
+      const b = currentBot();
+      if (!b) { $('dashboardStats').innerText = 'Chưa chọn bot'; return; }
+      $('dashboardStats').innerHTML = `Chats: ${b.knownChats?.length||0} | Warns: ${Object.values(b._warns||{}).reduce((a,b)=>a+b,0)}`;
+    }
+
+    window.exportBotConfig = () => {
+      const b = currentBot(); if (!b) return;
+      const blob = new Blob([JSON.stringify(b, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${b.name}_config.json`; a.click();
+    };
+    window.importBotConfig = () => {
+      const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.json';
+      inp.onchange = async e => {
+        const file = e.target.files[0]; if (!file) return;
+        const text = await file.text();
+        try {
+          const cfg = JSON.parse(text);
+          if (cfg.id && bots.find(b => b.id === cfg.id)) {
+            if (!confirm('Ghi đè?')) return;
+            bots = bots.map(b => b.id === cfg.id ? { ...cfg, isRunning: false } : b);
+          } else bots.push({ ...cfg, isRunning: false });
+          save(); renderList(); selectBot(cfg.id);
+        } catch (ex) { alert('File lỗi'); }
+      };
+      inp.click();
+    };
+
+    renderList();
+  })();
+</script>
+</body>
+</html>
